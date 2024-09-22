@@ -1,3 +1,4 @@
+"use client";
 import {
   baseBlackPieces,
   baseWhitePieces,
@@ -5,7 +6,16 @@ import {
   frontlinePieces,
 } from "@/app/contants";
 import Box from "../box/Box";
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addChessBoard } from "@/app/Slice/chessBoardMatrix";
+import Loader from "../Loader/Loader";
 const ChessBoard = () => {
+  const dispatch = useDispatch();
+  const chessBoard: chessPiece[][] = useSelector(
+    (store) => store.ChessBoardMatrix.chessBoard
+  );
+
   function createChessboardMatrix(): chessPiece[][] {
     const size = 8;
     const chessboard: chessPiece[][] = [];
@@ -37,6 +47,8 @@ const ChessBoard = () => {
           chessPiece: piece,
           color: color || "",
           index: `${i}${j}`,
+          totalPossibleMoves: [],
+          coloredBox: "",
         });
       }
 
@@ -45,15 +57,29 @@ const ChessBoard = () => {
 
     return chessboard;
   }
-  const handleClick = () => {};
-
   const chessboardMatrix = createChessboardMatrix();
+
+  useEffect(() => {
+    if (chessboardMatrix && chessBoard.length === 0) {
+      dispatch(addChessBoard(chessboardMatrix));
+    }
+  }, [chessBoard, chessboardMatrix, dispatch]);
+
+  const updatedMatrix = useMemo(() => {
+    return chessBoard;
+  }, [chessBoard]);
+
+  if (updatedMatrix.length === 0) {
+    return <Loader />;
+  }
 
   return (
     <div className="flex justify-center ">
       <div className="grid grid-cols-8 w-[48%] border border-[#d7b8a0] ">
-        {chessboardMatrix.map((row) =>
-          row.map((column) => <Box key={column.index} chessObj={column} />)
+        {updatedMatrix.map((row) =>
+          row.map((column) => (
+            <Box key={column.index} chessObj={column} chessBoard={chessBoard} />
+          ))
         )}
       </div>
     </div>
