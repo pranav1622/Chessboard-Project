@@ -10,9 +10,10 @@ import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addChessBoard } from "@/app/Slice/chessBoardMatrix";
 import Loader from "../Loader/Loader";
+import { useAppSelector } from "@/app/Slice/ReduxStore";
 const ChessBoard = () => {
   const dispatch = useDispatch();
-  const chessBoard: chessPiece[][] = useSelector(
+  const chessBoard: chessPiece[][] = useAppSelector(
     (store) => store.ChessBoardMatrix.chessBoard
   );
 
@@ -20,7 +21,7 @@ const ChessBoard = () => {
     const size = 8;
     const chessboard: chessPiece[][] = [];
     for (let i = 0; i < size; i++) {
-    const row: chessPiece[] = [];
+      const row: chessPiece[] = [];
 
       for (let j = 0; j < size; j++) {
         let piece = "";

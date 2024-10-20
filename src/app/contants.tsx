@@ -4,6 +4,14 @@ export const baseWhitePieces = ["R", "N", "B", "Q", "K", "B", "N", "R"];
 export const frontlinePieces = Array(8).fill("P");
 export const baseBlackPieces = ["R", "N", "B", "Q", "K", "B", "N", "R"];
 type style = React.SVGProps<SVGSVGElement>;
+
+export interface Istore {
+  ChessBoardMatrix: IChessBoard[];
+}
+export type IChessBoard = {
+  chessBoard: chessPiece[];
+  currentSelectedPiece: chessPiece;
+};
 export type chessPiece = {
   i: number;
   j: number;

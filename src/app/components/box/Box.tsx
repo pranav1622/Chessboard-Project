@@ -1,7 +1,11 @@
 "use client";
 
 import { chessPiece } from "@/app/contants";
-import { addChessBoard, addCurrentSelectedPiece } from "@/app/Slice/chessBoardMatrix";
+import {
+  addChessBoard,
+  addCurrentSelectedPiece,
+} from "@/app/Slice/chessBoardMatrix";
+import { useAppSelector } from "@/app/Slice/ReduxStore";
 import { useDispatch, useSelector } from "react-redux";
 interface BoxProps {
   chessObj: chessPiece;
@@ -10,60 +14,72 @@ interface BoxProps {
 const boxSize = "w-full";
 const Box: React.FC<BoxProps> = ({ chessObj, chessBoard }) => {
   const chessBgColor = chessObj.boxcolorNumber === 0 ? "#EBECD0" : "#6D8D4D";
-  const piecePossibleMoves = chessObj.possibleMoveColor ? chessObj.possibleMoveColor : "";
-  const chessColor = chessObj.color === "white" ? "text-[#ca5143] " : "text-black";
+  const piecePossibleMoves = chessObj.possibleMoveColor
+    ? chessObj.possibleMoveColor
+    : "";
+  const chessColor =
+    chessObj.color === "white" ? "text-[#ca5143] " : "text-black";
   const dispatch = useDispatch();
 
-  const currentSelectedPiece = useSelector(
+  const currentSelectedPiece = useAppSelector(
     (store) => store.ChessBoardMatrix.currentSelectedPiece
   );
-  
-  const handleMove=()=>{
-    const currentBox=chessObj;
-    if(currentSelectedPiece  && currentBox.possibleMoveColor !==""){
-      const updatedMatrix=chessBoard.map((row)=>{
-        const updatedColumn=row.map((column)=>{
-          if(currentBox.i === column.i && currentBox.j === column.j && column.possibleMoveColor !== ""){
+
+  const handleMove = () => {
+    const currentBox = chessObj;
+    if (currentSelectedPiece && currentBox.possibleMoveColor !== "") {
+      const updatedMatrix = chessBoard.map((row) => {
+        const updatedColumn = row.map((column) => {
+          if (
+            currentBox.i === column.i &&
+            currentBox.j === column.j &&
+            column.possibleMoveColor !== ""
+          ) {
             return {
               ...column,
               chessPiece: currentSelectedPiece.chessPiece,
-              color: currentSelectedPiece.chessColor,
-              possibleMoveColor:"",
-            }
-          }
-          else if(currentSelectedPiece && currentSelectedPiece.i===column.i && currentSelectedPiece.j===column.j){
+              color: currentSelectedPiece.color,
+              possibleMoveColor: "",
+            };
+          } else if (
+            currentSelectedPiece &&
+            currentSelectedPiece.i === column.i &&
+            currentSelectedPiece.j === column.j
+          ) {
             return {
               ...column,
-              chessPiece:'',
-              possibleMoveColor:"",
-            }
-          }else{
+              chessPiece: "",
+              possibleMoveColor: "",
+            };
+          } else {
             return {
               ...column,
-              possibleMoveColor:"",
-            }
+              possibleMoveColor: "",
+            };
           }
-        })
-        return updatedColumn
-      })
+        });
+        return updatedColumn;
+      });
 
-      if(currentSelectedPiece &&currentBox.possibleMoveColor !==" "){
-        dispatch(addChessBoard(updatedMatrix))
-        dispatch(addCurrentSelectedPiece(null))
+      if (currentSelectedPiece && currentBox.possibleMoveColor !== " ") {
+        dispatch(addChessBoard(updatedMatrix));
+        dispatch(addCurrentSelectedPiece(null));
       }
-
     }
-  }
+  };
 
   const handlPawnPossibleMoves = () => {
-    //if black then this
-    dispatch(addCurrentSelectedPiece({
-      i:chessObj.i,
-      j:chessObj.j,
-      chessPiece:chessObj.chessPiece,
-      chessColor:chessObj.color,
-      possibleMoveColor:chessObj.possibleMoveColor
-    }))
+    dispatch(
+      addCurrentSelectedPiece({
+        i: chessObj.i,
+        j: chessObj.j,
+        boxcolorNumber: chessObj.boxcolorNumber,
+        chessPiece: chessObj.chessPiece,
+        color: chessObj.color,
+        index: chessObj.index,
+        possibleMoveColor: chessObj.possibleMoveColor,
+      })
+    );
 
     const twoMoves = {
       i:
@@ -79,7 +95,7 @@ const Box: React.FC<BoxProps> = ({ chessObj, chessBoard }) => {
           : Number(chessObj.i) + 1,
       j: Number(chessObj.j),
     };
- 
+
     const updatedArray = chessBoard.map((row, _rowIndex) => {
       // if (rowIndex !== twoMoves.i && rowIndex !== oneMove.i) {
       //   return row;
@@ -103,7 +119,7 @@ const Box: React.FC<BoxProps> = ({ chessObj, chessBoard }) => {
       });
       return updatedColumn;
     });
-    dispatch(addChessBoard(updatedArray)) ;
+    dispatch(addChessBoard(updatedArray));
   };
 
   const handleKingPossibleMoves = () => {};
@@ -111,45 +127,56 @@ const Box: React.FC<BoxProps> = ({ chessObj, chessBoard }) => {
   const handleBishopPossibleMoves = () => {};
   const handleKnightPossibleMoves = () => {};
 
-
-
-
-
-
   const handleRookPossibleMoves = () => {
-    console.log(chessObj.j,chessObj.i)
-    const updatedMatrix= chessBoard.map((row,index)=>{
-      let chessPieceEncounterd=false
-      const updatedRow =row.map((column,_index)=>{
-        if(chessPieceEncounterd){
-          return column
-        }
-        if((chessObj.j===column.j|| chessObj.i===column.i) && column.chessPiece === ""){
+    dispatch(
+      addCurrentSelectedPiece({
+        i: chessObj.i,
+        j: chessObj.j,
+        boxcolorNumber: chessObj.boxcolorNumber,
+        chessPiece: chessObj.chessPiece,
+        color: chessObj.color,
+        index: chessObj.index,
+        possibleMoveColor: chessObj.possibleMoveColor,
+      })
+    );
+
+    const updatedMatrix = chessBoard.map((row, index) => {
+      let chessPieceEncounterd = false;
+      const updatedRow = row.map((column, _index) => {
+        // if (chessPieceEncounterd) {
+        //   return column;
+        // }
+        console.log(
+          chessObj.j === column.j || chessObj.i === column.i,
+          { chessObj },
+          { column }
+        );
+        if (
+          (chessObj.j === column.j || chessObj.i === column.i) &&
+          column.chessPiece === ""
+        ) {
           return {
             ...column,
             possibleMoveColor: "#B9CA43",
+          };
+        } else {
+          if (chessObj.chessPiece !== "") {
+            chessPieceEncounterd = true;
           }
-        }else{
-          if(chessObj.chessPiece!== ""){
-            chessPieceEncounterd=true
-          }
-          return{
+          return {
             ...column,
             possibleMoveColor: "",
-          }
+          };
         }
-      })
-      if(index===0){
-        chessPieceEncounterd=false
+      });
+      if (index === 0) {
+        chessPieceEncounterd = false;
       }
-      return updatedRow
-    })
-    console.log(updatedMatrix)
-    dispatch(addChessBoard(updatedMatrix))
+      return updatedRow;
+    });
+    console.log(updatedMatrix);
+    dispatch(addChessBoard(updatedMatrix));
   };
-
-
-
 
   const handlePieceClick = (e: React.MouseEvent<HTMLDivElement>) => {
     switch (chessObj.chessPiece) {
@@ -167,7 +194,7 @@ const Box: React.FC<BoxProps> = ({ chessObj, chessBoard }) => {
       case "R":
         handleRookPossibleMoves();
       default:
-        handleMove()
+        handleMove();
     }
   };
 
@@ -176,14 +203,17 @@ const Box: React.FC<BoxProps> = ({ chessObj, chessBoard }) => {
       className={`h-[70px] ${boxSize} bg-[${chessBgColor}] ${chessColor} flex justify-center items-center cursor-pointer`}
       onClick={handlePieceClick}
       style={{
-        background:chessBgColor,
+        background: chessBgColor,
         borderWidth: piecePossibleMoves !== "" ? "3px" : "",
         borderColor:
           piecePossibleMoves !== "" ? piecePossibleMoves : "transparent",
       }}
     >
       <span>{chessObj.chessPiece}</span>
-      {/* <span>{chessObj.i}{chessObj.j}</span>  */}
+      {/* <span>
+        {chessObj.i}
+        {chessObj.j}
+      </span> */}
     </h1>
   );
 };
